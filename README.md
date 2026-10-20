@@ -4,7 +4,7 @@ To adapt this project for another connector, update the connector-specific resou
 >
 * [README](./README.md): update the title and connector description.
 * [Element templates](./element-templates/): update the file-watch templates or replace them with templates for your connector.
-* [POM](./pom.xml): update artifact metadata and the element-template generator configuration.
+* [POM](./pom.xml): update artifact metadata.
 * Connector implementation: update `MyConnectorExecutable`, `MyConnectorProperties`, and the subscription classes under `src/main/java/io/camunda/connector/inbound/`; set the `@InboundConnector` type to match the element templates.
 * [Service Provider Interface (SPI)](./src/main/resources/META-INF/services/io.camunda.connector.api.inbound.InboundConnectorExecutable): update the registered executable class if it is renamed.
 >
@@ -38,13 +38,13 @@ the event type, monitored directory, and file name.
 
 ## Build
 
-You can package the Connector by running the following command:
+Using JDK 21, you can package the Connector by running the following command:
 
 ```bash
 mvn clean package
 ```
 
-This builds the connector JAR and runs the element-template generator configured in `pom.xml`.
+This builds the connector JAR. Element templates are maintained in `element-templates/`.
 
 The Connector SDK dependencies are declared with `provided` scope and are supplied by the Connector Runtime.
 
@@ -167,8 +167,6 @@ The local Connectors Runtime requires connection details to interact with your C
 The file-watch templates are `element-templates/File Watch Start Connector.json` and
 `element-templates/File Watch Intermediate Connector.json`.
 
-The Maven build also runs the [Element Template Generator](https://github.com/camunda/connectors/tree/main/element-template-generator/core)
-using the configuration in `pom.xml`. Its current output filenames are for email connector templates, so it does not
-generate or update the checked-in file-watch templates.
+The Maven build does not generate element templates; update the checked-in file-watch templates directly.
 
 The repository also contains generic starter templates; they are not configured for the file-watch connector.

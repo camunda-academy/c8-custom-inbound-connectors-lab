@@ -77,6 +77,25 @@ public class FileWatchConnectorTest {
     }
 
     @Test
+    void shouldHandleEmptyOrOverflowingPollingInterval() {
+        String[] intervals = {"", "9223372036854775808", "-9223372036854775809"};
+
+        for (String interval : intervals) {
+            assertThatThrownBy(() -> new MyConnectorProperties(eventToMonitor, directory, interval))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Test
+    void shouldAcceptLongPollingInterval() {
+        String interval = Long.toString(Long.MAX_VALUE);
+
+        var properties = new MyConnectorProperties(eventToMonitor, directory, interval);
+
+        assertThat(properties.pollingInterval()).isEqualTo(interval);
+    }
+
+    @Test
     void shouldHandleDifferentEventTypes() {
         // given
         String[] events = {"ENTRY_CREATE", "ENTRY_MODIFY", "ENTRY_DELETE"};
