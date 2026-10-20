@@ -1,15 +1,12 @@
 > A Connector template for new C8 inbound connector
 >
-> To use this template update the following resources to match the name of your connector:
+To adapt this project for another connector, update the connector-specific resources:
 >
-> * [README](./README.md) (title, description)
-> * [Element Template](./element-templates/template-connector-message-start-event.json)
-> * [POM](./pom.xml) (artifact name, id, description)
-> * [Connector Executable](src/main/java/io/camunda/connector/inbound/MyConnectorExecutable.java) (rename, implement,
-    update
-    `InboundConnector` annotation)
-> * [Service Provider Interface (SPI)](./src/main/resources/META-INF/services/io.camunda.connector.api.inbound.InboundConnectorExecutable) (
-    rename)
+* [README](./README.md): update the title and connector description.
+* [Element templates](./element-templates/): update the file-watch templates or replace them with templates for your connector.
+* [POM](./pom.xml): update artifact metadata and the element-template generator configuration.
+* Connector implementation: update `MyConnectorExecutable`, `MyConnectorProperties`, and the subscription classes under `src/main/java/io/camunda/connector/inbound/`; set the `@InboundConnector` type to match the element templates.
+* [Service Provider Interface (SPI)](./src/main/resources/META-INF/services/io.camunda.connector.api.inbound.InboundConnectorExecutable): update the registered executable class if it is renamed.
 >
 >
 > About [creating Connectors](https://docs.camunda.io/docs/components/connectors/custom-built-connectors/connector-sdk/#creating-a-custom-connector)
@@ -33,10 +30,11 @@ We strongly recommend reading through the [Messages documentation](https://docs.
 
 # Connector Template
 
-Camunda Inbound Connector Template
+Camunda File Watch Inbound Connector
 
-Emulates a simple inbound connector function that start process X times per minutes(to be specified in the element
-template)
+Watches a configured directory for file creation, modification, or deletion events. The selected event is correlated
+with a waiting intermediate event or starts a process, depending on the BPMN element used. The event payload contains
+the event type, monitored directory, and file name.
 
 ## Build
 
@@ -46,13 +44,9 @@ You can package the Connector by running the following command:
 mvn clean package
 ```
 
-This will create the following artifacts:
+This builds the connector JAR and runs the element-template generator configured in `pom.xml`.
 
-- A thin JAR without dependencies.
-- A fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK
-  artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing
-  the Connector.
-- All element templates
+The Connector SDK dependencies are declared with `provided` scope and are supplied by the Connector Runtime.
 
 ### Shading dependencies
 
@@ -63,7 +57,7 @@ This helps to avoid classpath conflicts when the Connector is executed.
 
 For example, without shading, you might encounter errors like:
 ```
-java.lang.NoSuchMethodError: com.fasterxml.jackson.databind.ObjectMapper.setserializationInclusion(Lcom/fasterxml/jackson/annotation/JsonInclude$Include;)Lcom/fasterxml/jackson/databind/ObjectMapper;
+java.lang.NoSuchMethodError: com.fasterxml.jackson.databind.ObjectMapper.setSerializationInclusion(Lcom/fasterxml/jackson/annotation/JsonInclude$Include;)Lcom/fasterxml/jackson/databind/ObjectMapper;
 ```
 This occurs when your connector and the runtime use different versions of the same library (e.g., Jackson).
 
@@ -75,27 +69,28 @@ provides more details on relocations.
 
 ### Input
 
-| Name               | Description                          | Example |
-|--------------------|--------------------------------------|---------|
-| Sender             | Message sender                       | `alice` |
-| Message per minute | Number of message created per minute | 6       |
+| Name | Description | Example |
+|------|-------------|---------|
+| Event to monitor | File event kind: `ENTRY_CREATE`, `ENTRY_MODIFY`, or `ENTRY_DELETE` | `ENTRY_CREATE` |
+| Directory | Path to the directory to watch | `/var/inbox` |
+| Polling interval | Time in seconds between checks for events | `30` |
 
 ### Output
 
 ```json
 {
-  "event":{
-    "sender":"test",
-    "code":4,
-    "message":"56b020ef-e51a-4a4b-b9a4-8df521a2e78f"
+  "event": {
+    "monitoredEvent": "ENTRY_CREATE",
+    "directory": "/var/inbox",
+    "fileName": "report.csv"
   }
 }
 ```
 
 ## Testing
-### Unit and Integration Tests
+### Unit Tests
 
-You can run the unit and integration tests by executing the following Maven command:
+Run the tests with Maven:
 ```bash
 mvn clean verify
 ```
@@ -114,14 +109,14 @@ You will need the following tools installed on your machine:
 
 The Connectors Runtime requires a running Camunda platform to interact with. To set up a local Camunda environment, follow these steps:
 
-1. Clone the [Camunda distributions repository](https://github.com/camunda/camunda-distributions) from GitHub and navigate to the Camunda 8.8 docker-compose directory:
+1. Clone the [Camunda distributions repository](https://github.com/camunda/camunda-distributions) and navigate to the Camunda 8.9 Docker Compose directory:
 
 ```shell
-git clone git@github.com:camunda/camunda-distributions.git
-cd cd docker-compose/versions/camunda-8.8
+git clone https://github.com/camunda/camunda-distributions.git
+cd camunda-distributions/docker-compose/versions/camunda-8.9
 ```
 
-**Note:** This template is compatible with Camunda 8.8. Using other versions may lead to compatibility issues.
+The project uses Camunda 8.9 and Connectors 8.9 dependencies in `pom.xml`; use a compatible platform version.
 
 Either comment out the connectors service, or use the `--scale` flag to exclude it:
 
@@ -129,50 +124,51 @@ Either comment out the connectors service, or use the `--scale` flag to exclude 
 docker compose -f docker-compose-core.yaml up --scale connectors=0
 ```
 
-#### Configure the Desktop Modeler and Use Your Connector
+#### Configure Modeler and Use Your Connector
 
-Add the `element-templates/template-connector-message-start-event.json` to your Modeler configuration as per
-   the [Element Templates documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/element-templates/configuring-templates/).
+Configure Modeler to load the files in the `element-templates` directory, following the
+[Element Templates documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/element-templates/configuring-templates/).
+Use `File Watch Start Connector.json` for a start event or `File Watch Intermediate Connector.json` for an intermediate
+catch event.
 
 #### Using Your Connector
 Then, to use your connector in a local Camunda environment, follow these steps:
 
-1. Run `io.camunda.connector.inbound.LocalConnectorRuntime` to start your connector.
+1. Run `io.camunda.connector.inbound.LocalConnectorRuntime` from the IDE with the test classpath; the class is under `src/test/java`.
 2. Open the Camunda Desktop Modeler and create a new BPMN diagram.
 3. Design a process that incorporates your newly created connector.
 4. Deploy the process to your local Camunda platform.
-3. Verify that the process is running smoothly by accessing Camunda Operate at [localhost:8088/operate](http://localhost:8088/operate). Username and password are both `demo`.
+5. Verify the process in Camunda Operate. With the documented local Compose configuration, the URL is [http://localhost:8088/operate](http://localhost:8088/operate); the default credentials are `demo` / `demo`.
 
 ### SaaS environment
 
 #### Creating an API Client
 
-The Connectors Runtime (LocalConnectorRuntime) requires connection details to interact with your Camunda SaaS cluster. To set this up, follow these steps:
+The local Connectors Runtime requires connection details to interact with your Camunda SaaS cluster. Use a cluster compatible with the Camunda and Connectors versions configured in `pom.xml`. To set this up, follow these steps:
 
 1. Navigate to Camunda [SaaS](https://console.camunda.io).
-2. Create a cluster using the latest version available.
+2. Create a cluster on a version compatible with the Camunda and Connectors dependencies in `pom.xml`.
 3. Select your cluster, then go to the `API` section and click `Create new Client`.
 4. Ensure the `zeebe` checkbox is selected, then click `Create`.
 5. Copy the configuration details displayed under the `Spring Boot` tab.
-6. Paste the copied configuration into your `application.properties` file within your project.
+6. Add the copied configuration to `src/test/resources/application.properties` (or the active runtime configuration).
 
 #### Using Your Connector
 
-1. Start your connector by executing `io.camunda.connector.inbound.LocalConnectorRuntime` in your development
-   environment.
+1. Start `io.camunda.connector.inbound.LocalConnectorRuntime` from the IDE with the test classpath; the class is under `src/test/java`.
 2. Access the Web Modeler and create a new project.
 3. Click on `Create new`, then select `Upload files`. Upload the connector template from the repository you have.
 4. After uploading, **publish the connector template** by clicking the Publish button.
 5. In the same folder, create a new BPMN diagram.
 6. Design and start a process that incorporates your new connector.
 
-## Element Template
+## Element Templates
 
-The element template for this sample connector is generated automatically based on the connector
-input class using
-the [Element Template Generator](https://github.com/camunda/connectors/tree/main/element-template-generator/core).
+The file-watch templates are `element-templates/File Watch Start Connector.json` and
+`element-templates/File Watch Intermediate Connector.json`.
 
-The generation is embedded in the Maven build and can be triggered by running `mvn clean package`.
+The Maven build also runs the [Element Template Generator](https://github.com/camunda/connectors/tree/main/element-template-generator/core)
+using the configuration in `pom.xml`. Its current output filenames are for email connector templates, so it does not
+generate or update the checked-in file-watch templates.
 
-The generated element template can be found
-in [element-templates/template-connector-message-start-event.json](./element-templates/template-connector-message-start-event.json).
+The repository also contains generic starter templates; they are not configured for the file-watch connector.
