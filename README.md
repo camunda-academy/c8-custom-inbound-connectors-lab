@@ -109,14 +109,14 @@ You will need the following tools installed on your machine:
 
 The Connectors Runtime requires a running Camunda platform to interact with. To set up a local Camunda environment, follow these steps:
 
-1. Clone the [Camunda distributions repository](https://github.com/camunda/camunda-distributions) and navigate to the Camunda 8.9 Docker Compose directory:
+1. Clone the [Camunda distributions repository](https://github.com/camunda/camunda-distributions) and navigate to the Camunda 8.10 Docker Compose directory:
 
 ```shell
 git clone https://github.com/camunda/camunda-distributions.git
-cd camunda-distributions/docker-compose/versions/camunda-8.9
+cd camunda-distributions/docker-compose/versions/camunda-8.10
 ```
 
-The project uses Camunda 8.9 and Connectors 8.9 dependencies in `pom.xml`; use a compatible platform version.
+The project uses Camunda 8.10 and Connectors 8.10 dependencies in `pom.xml`; use a compatible platform version.
 
 Either comment out the connectors service, or use the `--scale` flag to exclude it:
 

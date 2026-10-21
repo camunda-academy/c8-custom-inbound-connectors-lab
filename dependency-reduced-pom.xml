@@ -10,7 +10,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.5</version>
+        <version>3.6.0</version>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -83,19 +83,19 @@
     <dependency>
       <groupId>io.camunda.connector</groupId>
       <artifactId>connector-core</artifactId>
-      <version>8.9.0</version>
+      <version>8.10.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.camunda.connector</groupId>
       <artifactId>connector-validation</artifactId>
-      <version>8.9.0</version>
+      <version>8.10.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.camunda.connector</groupId>
       <artifactId>connector-test</artifactId>
-      <version>8.9.0</version>
+      <version>8.10.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -107,7 +107,7 @@
     <dependency>
       <groupId>io.camunda.connector</groupId>
       <artifactId>connector-runtime-test</artifactId>
-      <version>8.9.0</version>
+      <version>8.10.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -116,6 +116,10 @@
         </exclusion>
         <exclusion>
           <artifactId>connector-object-mapper</artifactId>
+          <groupId>io.camunda.connector</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>host-ip-validator</artifactId>
           <groupId>io.camunda.connector</groupId>
         </exclusion>
         <exclusion>
@@ -135,13 +139,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.17</version>
+      <version>2.0.20</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.23.0</version>
+      <version>5.24.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -161,7 +165,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <version>5.23.0</version>
+      <version>5.24.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -185,11 +189,15 @@
     <dependency>
       <groupId>io.camunda</groupId>
       <artifactId>camunda-process-test-spring</artifactId>
-      <version>8.9.0</version>
+      <version>8.10.5</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
           <artifactId>camunda-process-test-java</artifactId>
+          <groupId>io.camunda</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>camunda-process-test-coverage</artifactId>
           <groupId>io.camunda</groupId>
         </exclusion>
         <exclusion>
@@ -206,10 +214,6 @@
         </exclusion>
         <exclusion>
           <artifactId>camunda-client-java</artifactId>
-          <groupId>io.camunda</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>zeebe-client-java</artifactId>
           <groupId>io.camunda</groupId>
         </exclusion>
         <exclusion>
@@ -245,10 +249,6 @@
           <groupId>com.google.code.findbugs</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>checker-qual</artifactId>
-          <groupId>org.checkerframework</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>httpclient5</artifactId>
           <groupId>org.apache.httpcomponents.client5</groupId>
         </exclusion>
@@ -257,15 +257,23 @@
           <groupId>org.apache.httpcomponents.core5</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>grpc-api</artifactId>
+          <groupId>io.grpc</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>jackson-databind</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-jupiter-api</artifactId>
+          <groupId>org.junit.jupiter</groupId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>io.camunda.connector</groupId>
       <artifactId>spring-boot-starter-camunda-connectors</artifactId>
-      <version>8.9.0</version>
+      <version>8.10.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -279,6 +287,10 @@
         <exclusion>
           <artifactId>connector-feel</artifactId>
           <groupId>io.camunda.connector</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-boot-webmvc</artifactId>
+          <groupId>org.springframework.boot</groupId>
         </exclusion>
         <exclusion>
           <artifactId>spring-boot-starter-webmvc</artifactId>
@@ -301,16 +313,16 @@
           <groupId>org.springframework.boot</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jakarta.annotation-api</artifactId>
-          <groupId>jakarta.annotation</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>micrometer-core</artifactId>
           <groupId>io.micrometer</groupId>
         </exclusion>
         <exclusion>
           <artifactId>spring-web</artifactId>
           <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>host-ip-validator</artifactId>
+          <groupId>io.camunda.connector</groupId>
         </exclusion>
         <exclusion>
           <artifactId>connector-runtime-core</artifactId>
@@ -369,12 +381,12 @@
     <java.version>21</java.version>
     <version.awaitility>4.3.0</version.awaitility>
     <maven.compiler.source>21</maven.compiler.source>
-    <version.mockito>5.23.0</version.mockito>
+    <version.mockito>5.24.0</version.mockito>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.junit-jupiter>6.0.0</version.junit-jupiter>
-    <version.connectors>8.9.0</version.connectors>
-    <version.camunda>8.9.0</version.camunda>
+    <version.connectors>8.10.1</version.connectors>
+    <version.camunda>8.10.5</version.camunda>
   </properties>
 </project>

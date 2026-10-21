@@ -13,10 +13,10 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <version.connectors>8.9.5</version.connectors>
-        <version.camunda>8.9.13</version.camunda>
+        <version.connectors>8.10.1</version.connectors>
+        <version.camunda>8.10.5</version.camunda>
         <version.assertj>3.27.6</version.assertj>
-        <version.mockito>5.23.0</version.mockito>
+        <version.mockito>5.24.0</version.mockito>
         <version.junit-jupiter>6.0.0</version.junit-jupiter>
         <version.awaitility>4.3.0</version.awaitility>
         <java.version>21</java.version>
@@ -30,6 +30,13 @@
             <artifactId>connector-core</artifactId>
             <version>${version.connectors}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Element template generator annotations (compile-time only) -->
+        <dependency>
+            <groupId>io.camunda.connector</groupId>
+            <artifactId>element-template-generator-annotations</artifactId>
+            <version>${version.connectors}</version>
         </dependency>
 
         <dependency>
@@ -57,7 +64,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.18</version>
+            <version>2.0.20</version>
             <scope>provided</scope>
         </dependency>
 
@@ -104,7 +111,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.6</version>
+                <version>3.6.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -117,6 +124,40 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.camunda.connector</groupId>
+                <artifactId>element-template-generator-maven-plugin</artifactId>
+                <version>${version.connectors}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-templates</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <connectors>
+                        <connector>
+                            <connectorClass>io.camunda.connector.inbound.MyConnectorExecutable</connectorClass>
+                            <files>
+                                <file>
+                                    <templateId>io.camunda.connectors.inbound.EmailMessageStartEvent.v1</templateId>
+                                    <templateFileName>email-inbound-connector-start-event.json</templateFileName>
+                                </file>
+                                <file>
+                                    <templateId>io.camunda.connectors.inbound.EmailIntermediate.v1</templateId>
+                                    <templateFileName>email-inbound-connector-intermediate.json</templateFileName>
+                                </file>
+                                <file>
+                                    <templateId>io.camunda.connectors.inbound.EmailBoundary.v1</templateId>
+                                    <templateFileName>email-inbound-connector-boundary.json</templateFileName>
+                                </file>
+                            </files>
+                        </connector>
+                    </connectors>
+                </configuration>
             </plugin>
         </plugins>
     </build>
